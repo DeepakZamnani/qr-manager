@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_URL || ''
+const API_BASE = 'https://qr-manager-mu.vercel.app'
 
 function token() {
   return localStorage.getItem('qr_token') || ''

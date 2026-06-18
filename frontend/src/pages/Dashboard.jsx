@@ -4,7 +4,7 @@ import { QRCodeCanvas } from 'qrcode.react'
 import { api } from '../lib/api'
 
 function getBase() {
-  return import.meta.env.VITE_API_URL || window.location.origin
+  return 'https://qr-manager-mu.vercel.app'
 }
 
 function truncate(str, n = 42) {
