@@ -1,18 +1,20 @@
 import 'dotenv/config'
 import express from 'express'
+import cors from 'cors'
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { randomBytes } from 'crypto'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
-const ROOT = join(__dirname, '..')
 const app = express()
 const PORT = process.env.PORT || 3001
 const PASSWORD = process.env.DASHBOARD_PASSWORD || 'changeme'
-const DATA_FILE = join(ROOT, 'data', 'qr-codes.json')
+const DATA_FILE = join(__dirname, 'data', 'qr-codes.json')
 
-mkdirSync(join(ROOT, 'data'), { recursive: true })
+mkdirSync(join(__dirname, 'data'), { recursive: true })
+
+app.use(cors({ origin: process.env.CORS_ORIGIN || '*' }))
 app.use(express.json())
 
 function auth(req, res, next) {
@@ -84,10 +86,4 @@ app.delete('/api/qr-codes/:id', auth, (req, res) => {
   res.json({ success: true })
 })
 
-// Production: serve built frontend
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(join(ROOT, 'dist')))
-  app.get('*', (req, res) => res.sendFile(join(ROOT, 'dist', 'index.html')))
-}
-
-app.listen(PORT, () => console.log(`Server: http://localhost:${PORT}`))
+app.listen(PORT, () => console.log(`Backend: http://localhost:${PORT}`))

@@ -1,9 +1,11 @@
+const API_BASE = import.meta.env.VITE_API_URL || ''
+
 function token() {
   return localStorage.getItem('qr_token') || ''
 }
 
 async function request(path, opts = {}) {
-  const res = await fetch(path, {
+  const res = await fetch(`${API_BASE}${path}`, {
     ...opts,
     headers: {
       'Content-Type': 'application/json',

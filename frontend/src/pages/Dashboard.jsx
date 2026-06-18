@@ -4,7 +4,7 @@ import { QRCodeCanvas } from 'qrcode.react'
 import { api } from '../lib/api'
 
 function getBase() {
-  return import.meta.env.VITE_BASE_URL || window.location.origin
+  return import.meta.env.VITE_API_URL || window.location.origin
 }
 
 function truncate(str, n = 42) {
