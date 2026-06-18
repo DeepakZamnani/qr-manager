@@ -8,7 +8,7 @@ import { randomBytes } from 'crypto'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const DATA_FILE = join(__dirname, 'data', 'qr-codes.json')
-mkdirSync(join(__dirname, 'data'), { recursive: true })
+if (!process.env.VERCEL) mkdirSync(join(__dirname, 'data'), { recursive: true })
 
 const app = express()
 const PASSWORD = process.env.DASHBOARD_PASSWORD || 'changeme'
@@ -38,6 +38,7 @@ async function readData() {
     const { result } = await upstash(['GET', 'qr-codes'])
     return result ? JSON.parse(result) : []
   }
+  if (process.env.VERCEL) return []
   if (!existsSync(DATA_FILE)) return []
   return JSON.parse(readFileSync(DATA_FILE, 'utf8'))
 }
@@ -47,7 +48,7 @@ async function saveData(data) {
     await upstash(['SET', 'qr-codes', JSON.stringify(data)])
     return
   }
-  writeFileSync(DATA_FILE, JSON.stringify(data, null, 2))
+  if (!process.env.VERCEL) writeFileSync(DATA_FILE, JSON.stringify(data, null, 2))
 }
 
 // Public: QR redirect
