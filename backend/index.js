@@ -12,8 +12,7 @@ if (!process.env.VERCEL) mkdirSync(join(__dirname, 'data'), { recursive: true })
 
 const app = express()
 const PASSWORD = process.env.DASHBOARD_PASSWORD || 'changeme'
-const UPSTASH_URL = process.env.UPSTASH_REDIS_REST_URL
-const UPSTASH_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN
+const FB_URL = process.env.FIREBASE_DB_URL  // e.g. https://your-project-default-rtdb.firebaseio.com
 
 app.use(cors({ origin: '*' }))
 app.use(express.json())
@@ -24,19 +23,11 @@ function auth(req, res, next) {
   next()
 }
 
-async function upstash(cmd) {
-  const res = await fetch(UPSTASH_URL, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${UPSTASH_TOKEN}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(cmd),
-  })
-  return res.json()
-}
-
 async function readData() {
-  if (UPSTASH_URL) {
-    const { result } = await upstash(['GET', 'qr-codes'])
-    return result ? JSON.parse(result) : []
+  if (FB_URL) {
+    const res = await fetch(`${FB_URL}/qr-codes.json`)
+    const data = await res.json()
+    return Array.isArray(data) ? data : []
   }
   if (process.env.VERCEL) return []
   if (!existsSync(DATA_FILE)) return []
@@ -44,8 +35,12 @@ async function readData() {
 }
 
 async function saveData(data) {
-  if (UPSTASH_URL) {
-    await upstash(['SET', 'qr-codes', JSON.stringify(data)])
+  if (FB_URL) {
+    await fetch(`${FB_URL}/qr-codes.json`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    })
     return
   }
   if (!process.env.VERCEL) writeFileSync(DATA_FILE, JSON.stringify(data, null, 2))
