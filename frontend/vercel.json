@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    { "source": "/r/:path*",             "destination": "/api/server" },
+    { "source": "/api/auth/:path*",      "destination": "/api/server" },
+    { "source": "/api/qr-codes/:path*",  "destination": "/api/server" },
+    { "source": "/api/qr-codes",         "destination": "/api/server" },
+    { "source": "/(.*)",                 "destination": "/index.html" }
+  ]
+}
